@@ -31,16 +31,4 @@ public class ChargingStationController {
         chargingStationService.addBook(param);
         return Result.success();
     }
-
-    @GetMapping("/v1/station/getBook")
-    public Result<List<GetBookResponseVo>> getBook(@RequestParam("userId") Long userId) {
-        List<GetBookResponseVo> book = chargingStationService.getBook(userId);
-        return Result.success(book);
-    }
-
-    @PostMapping("/v1/station/useBook")
-    public Result<Void> useBook(@RequestParam("bookId") Long bookId) {
-        chargingStationService.useBook(bookId);
-        return Result.success();
-    }
 }

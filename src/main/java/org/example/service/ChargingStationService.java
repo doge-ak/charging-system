@@ -184,40 +184,6 @@ public class ChargingStationService {
         chargingPileBookRepository.save(chargingPileBookPo);
     }
 
-    @Transactional
-    public List<GetBookResponseVo> getBook(Long userId) {
-        List<ChargingPileBookPo> chargingPileBooks = chargingPileBookRepository.findAllByUserId(userId);
-        List<GetBookResponseVo> resp = chargingPileBooks.stream()
-            .map(it -> {
-                GetBookResponseVo getBookResponseVo = new GetBookResponseVo();
-                getBookResponseVo.setBookId(it.getId());
-                getBookResponseVo.setUserId(userId);
-                getBookResponseVo.setChargingPileId(it.getChargingPileId());
-                getBookResponseVo.setBookTime(it.getBookTime());
-                ChargingPilePo chargingPilePo = chargingPileRepository.findById(it.getChargingPileId()).orElseThrow();
-                getBookResponseVo.setMaxPowerKw(chargingPilePo.getMaxPowerKw());
-                ChargingStationPo chargingStationPo = chargingStationRepository.findById(chargingPilePo.getChargingStationId()).orElseThrow();
-                getBookResponseVo.setChargingStationId(chargingStationPo.getId());
-                getBookResponseVo.setLongitude(chargingStationPo.getLongitude());
-                getBookResponseVo.setLatitude(chargingStationPo.getLatitude());
-                getBookResponseVo.setCurrentElectricityPrice(chargingStationPo.getCurrentElectricityPrice());
-                return getBookResponseVo;
-            })
-            .toList();
-        return resp;
-    }
-
-    @Transactional
-    public void useBook(Long bookId) {
-        ChargingPileBookPo chargingPileBookPo = chargingPileBookRepository.findById(bookId).orElseThrow();
-        LocalDateTime bookTime = chargingPileBookPo.getBookTime();
-        if (!(bookTime.isBefore(LocalDateTime.now()) && bookTime.isAfter(LocalDateTime.now().plusHours(1)))) {
-            throw new ServiceException(400, "不在使用充电桩时间内");
-        }
-        chargingPileBookPo.setBookStatus(BookStatus.USED);
-        chargingPileBookRepository.save(chargingPileBookPo);
-    }
-
     /**
      * 这个方法是定时任务，每5分钟执行一次，
      */
